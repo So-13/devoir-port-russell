@@ -27,4 +27,130 @@ exports.getCatwayById = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: "Erreur serveur", error: error.message });
     }
+    /**
+ * Créer un nouveau catway (POST /catways)
+ */
+exports.createCatway = async (req, res) => {
+    const { catwayNumber, catwayType, catwayState } = req.body;
+
+    try {
+        // Style défensif : On vérifie si ce numéro de catway existe déjà en base
+        const existingCatway = await Catway.findOne({ catwayNumber });
+        if (existingCatway) {
+            return res.status(400).json({ message: "Ce numéro de catway existe déjà." });
+        }
+
+        const newCatway = new Catway({ catwayNumber, catwayType, catwayState });
+        await newCatway.save();
+        
+        return res.status(201).json({ message: "Catway créé avec succès", catway: newCatway });
+    } catch (error) {
+        return res.status(400).json({ message: "Erreur lors de la création", error: error.message });
+    }
+};
+
+/**
+ * Modifier l'état d'un catway spécifique (PUT /catways/:id)
+ * (Rappel de l'énoncé : le numéro et le type ne doivent pas être modifiables)
+ */
+exports.updateCatway = async (req, res) => {
+    const { catwayState } = req.body;
+
+    try {
+        // Style défensif : On ne met à jour QUE le champ catwayState demandé par le sujet
+        const updatedCatway = await Catway.findOneAndUpdate(
+            { catwayNumber: req.params.id },
+            { catwayState },
+            { new: true, runValidators: true } // 'new: true' renvoie l'objet modifié, 'runValidators' applique les règles du modèle
+        );
+
+        if (!updatedCatway) {
+            return res.status(404).json({ message: "Catway non trouvé" });
+        }
+
+        return res.status(200).json({ message: "État du catway mis à jour avec succès", catway: updatedCatway });
+    } catch (error) {
+        return res.status(500).json({ message: "Erreur lors de la mise à jour", error: error.message });
+    }
+};
+
+/**
+ * Supprimer un catway (DELETE /catways/:id)
+ */
+exports.deleteCatway = async (req, res) => {
+    try {
+        const deletedCatway = await Catway.findOneAndDelete({ catwayNumber: req.params.id });
+        
+        if (!deletedCatway) {
+            return res.status(404).json({ message: "Catway non trouvé" });
+        }
+
+        return res.status(200).json({ message: "Catway supprimé avec succès" });
+    } catch (error) {
+        return res.status(500).json({ message: "Erreur lors de la suppression", error: error.message });
+    }
+    /**
+ * Créer un nouveau catway (POST /catways)
+ */
+exports.createCatway = async (req, res) => {
+    const { catwayNumber, catwayType, catwayState } = req.body;
+
+    try {
+        // Style défensif : On vérifie si ce numéro de catway existe déjà en base
+        const existingCatway = await Catway.findOne({ catwayNumber });
+        if (existingCatway) {
+            return res.status(400).json({ message: "Ce numéro de catway existe déjà." });
+        }
+
+        const newCatway = new Catway({ catwayNumber, catwayType, catwayState });
+        await newCatway.save();
+        
+        return res.status(201).json({ message: "Catway créé avec succès", catway: newCatway });
+    } catch (error) {
+        return res.status(400).json({ message: "Erreur lors de la création", error: error.message });
+    }
+};
+
+/**
+ * Modifier l'état d'un catway spécifique (PUT /catways/:id)
+ * (Rappel de l'énoncé : le numéro et le type ne doivent pas être modifiables)
+ */
+exports.updateCatway = async (req, res) => {
+    const { catwayState } = req.body;
+
+    try {
+        // Style défensif : On ne met à jour QUE le champ catwayState demandé par le sujet
+        const updatedCatway = await Catway.findOneAndUpdate(
+            { catwayNumber: req.params.id },
+            { catwayState },
+            { new: true, runValidators: true } // 'new: true' renvoie l'objet modifié, 'runValidators' applique les règles du modèle
+        );
+
+        if (!updatedCatway) {
+            return res.status(404).json({ message: "Catway non trouvé" });
+        }
+
+        return res.status(200).json({ message: "État du catway mis à jour avec succès", catway: updatedCatway });
+    } catch (error) {
+        return res.status(500).json({ message: "Erreur lors de la mise à jour", error: error.message });
+    }
+};
+
+/**
+ * Supprimer un catway (DELETE /catways/:id)
+ */
+exports.deleteCatway = async (req, res) => {
+    try {
+        const deletedCatway = await Catway.findOneAndDelete({ catwayNumber: req.params.id });
+        
+        if (!deletedCatway) {
+            return res.status(404).json({ message: "Catway non trouvé" });
+        }
+
+        return res.status(200).json({ message: "Catway supprimé avec succès" });
+    } catch (error) {
+        return res.status(500).json({ message: "Erreur lors de la suppression", error: error.message });
+    }
+};
+
 };
