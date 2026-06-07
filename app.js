@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
@@ -18,6 +19,10 @@ const app = express();
 
 // Middlewares globaux indispensables
 app.use(express.json());
+// Configuration du moteur de template EJS
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
