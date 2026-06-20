@@ -13,7 +13,7 @@ router.get('/:idReservation', reservationController.getReservationDetail);
 // Créer une réservation -> POST /catways/:id/reservations
 router.post('/', reservationController.createReservation);
 
-// Supprimer une réservation -> DELETE /catways/:id/reservations/:idReservation
-router.delete('/:idReservation', reservationController.deleteReservation);
+// Supprimer une réservation (On passe en POST pour le bouton HTML !) -> POST /catways/:id/reservations/:idReservation/delete
+router.post('/:idReservation/delete', reservationController.deleteReservation);
 
 module.exports = router;

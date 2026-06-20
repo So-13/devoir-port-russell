@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Réservations - Catway n°<%= catwayNumber %></title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #111; padding: 10px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .btn-delete { background-color: #dc3545; color: white; border: none; padding: 5px 10px; cursor: pointer; }
+        .form-add { margin-top: 40px; background: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <a href="/catways/catways-dashboard">⬅️ Retour au tableau de bord</a>
+
+    <h2>Réservations pour le Catway n°<%= catwayNumber %></h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nom du Client</th>
+                <th>Nom du Bateau</th>
+                <th>Date de Début</th>
+                <th>Date de Fin</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (reservations && reservations.length > 0) { %>
+                <% reservations.forEach(res => { %>
+                    <tr>
+                        <td><%= res.clientName %></td>
+                        <td><%= res.boatName %></td>
+                        <td><%= new Date(res.startDate).toLocaleDateString('fr-FR') %></td>
+                        <td><%= new Date(res.endDate).toLocaleDateString('fr-FR') %></td>
+                        <td>
+                            <form action="/catways/<%= catwayNumber %>/reservations/<%= res._id %>/delete" method="POST" style="display:inline;">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Supprimer cette réservation ?')">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="5" style="text-align: center;">Aucune réservation pour le moment.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+    <div class="form-add">
+        <h3>Ajouter une nouvelle réservation</h3>
+        <form action="/catways/<%= catwayNumber %>/reservations" method="POST">
+            <div class="form-group">
+                <label>Nom du Client :</label>
+                <input type="text" name="clientName" required>
+            </div>
+            <div class="form-group">
+                <label>Nom du Bateau :</label>
+                <input type="text" name="boatName" required>
+            </div>
+            <div class="form-group">
+                <label>Date de Début :</label>
+                <input type="date" name="startDate" required>
+            </div>
+            <div class="form-group">
+                <label>Date de Fin :</label>
+                <input type="date" name="endDate" required>
+            </div>
+            <button type="submit" style="background-color: #28a745; color: white; padding: 10px 15px; border: none; cursor: pointer;">Créer la réservation</button>
+        </form>
+    </div>
+
+</body>
+</html>
