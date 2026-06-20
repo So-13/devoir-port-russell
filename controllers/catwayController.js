@@ -1,81 +1,74 @@
 const Catway = require('../models/Catway');
 
-/**
- * Récupérer la liste de tous les catways (GET /catways)
- */
+// 1. GET /catways - Liste tous les catways (API)
 exports.getAllCatways = async (req, res) => {
     try {
         const catways = await Catway.find();
         return res.status(200).json(catways);
     } catch (error) {
-        return res.status(500).json({ message: "Erreur lors de la récupération des catways", error: error.message });
+        return res.status(500).json({ message: error.message });
     }
 };
 
-/**
- * Récupérer un catway spécifique par son numéro (GET /catways/:id)
- */
+// 2. GET /catways/:id - Récupère un catway par son numéro
 exports.getCatwayById = async (req, res) => {
     try {
         const catway = await Catway.findOne({ catwayNumber: req.params.id });
         if (!catway) {
-            return res.status(404).json({ message: "Catway non trouvé" });
+            return res.status(404).json({ message: "Catway introuvable" });
         }
         return res.status(200).json(catway);
     } catch (error) {
-        return res.status(500).json({ message: "Erreur serveur", error: error.message });
+        return res.status(500).json({ message: error.message });
     }
 };
 
-/**
- * Créer un nouveau catway (POST /catways)
- */
+// 3. POST /catways - Crée un catway (Formulaire HTML)
 exports.createCatway = async (req, res) => {
-    const { catwayNumber, catwayType, catwayState } = req.body;
     try {
-        const existingCatway = await Catway.findOne({ catwayNumber });
-        if (existingCatway) {
-            return res.status(400).json({ message: "Ce numéro de catway existe déjà." });
-        }
-        const newCatway = new Catway({ catwayNumber, catwayType, catwayState });
-        await newCatway.save();
-        return res.status(201).json({ message: "Catway créé avec succès", catway: newCatway });
+        const { catwayNumber, catwayType, catwayState } = req.body;
+
+        await Catway.create({
+            catwayNumber,
+            catwayType,
+            catwayState
+        });
+
+        return res.redirect('/catways/catways-dashboard');
     } catch (error) {
-        return res.status(400).json({ message: "Erreur lors de la création", error: error.message });
+        return res.status(500).send("Erreur lors de la création du catway : " + error.message);
     }
 };
 
-/**
- * Modifier l'état d'un catway spécifique (PUT /catways/:id)
- */
+// 4. PUT /catways/:id - Modifie l'état d'un catway
 exports.updateCatway = async (req, res) => {
-    const { catwayState } = req.body;
     try {
-        const updatedCatway = await Catway.findOneAndUpdate(
+        const { catwayState } = req.body;
+        const catway = await Catway.findOneAndUpdate(
             { catwayNumber: req.params.id },
             { catwayState },
-            { new: true, runValidators: true }
+            { new: true }
         );
-        if (!updatedCatway) {
-            return res.status(404).json({ message: "Catway non trouvé" });
+        if (!catway) {
+            return res.status(404).json({ message: "Catway introuvable" });
         }
-        return res.status(200).json({ message: "État du catway mis à jour avec succès", catway: updatedCatway });
+        return res.status(200).json(catway);
     } catch (error) {
-        return res.status(500).json({ message: "Erreur lors de la mise à jour", error: error.message });
+        return res.status(500).json({ message: error.message });
     }
 };
 
-/**
- * Supprimer un catway (DELETE /catways/:id)
- */
+// 5. DELETE /catways/:id - Supprime un catway
+// 5. DELETE /catways/:id - Supprime un catway
 exports.deleteCatway = async (req, res) => {
     try {
-        const deletedCatway = await Catway.findOneAndDelete({ catwayNumber: req.params.id });
-        if (!deletedCatway) {
-            return res.status(404).json({ message: "Catway non trouvé" });
-        }
-        return res.status(200).json({ message: "Catway supprimé avec succès" });
+        // 1. On cherche et on supprime le catway grâce à son numéro
+        await Catway.findOneAndDelete({ catwayNumber: req.params.id });
+        
+        // 2. Une fois supprimé, on recharge immédiatement ton tableau de bord
+        return res.redirect('/catways/catways-dashboard');
     } catch (error) {
-        return res.status(500).json({ message: "Erreur lors de la suppression", error: error.message });
+        // En cas de problème, on affiche l'erreur sur l'écran
+        return res.status(500).send("Erreur lors de la suppression : " + error.message);
     }
 };

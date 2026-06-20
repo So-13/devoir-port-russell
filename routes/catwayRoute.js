@@ -1,20 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const catwayController = require('../controllers/catwayController');
+const Catway = require('../models/Catway'); 
 
-// Route pour lister tous les catways -> GET /catways
+// Interface du tableau de bord (Vue EJS avec les vraies données)
+router.get('/catways-dashboard', async (req, res) => {
+    try {
+        const catways = await Catway.find();
+        res.render('catways', { catways: catways });
+    } catch (error) {
+        res.status(500).send("Erreur lors de la récupération des catways");
+    }
+});
+
+// Routes de l'API CRUD
 router.get('/', catwayController.getAllCatways);
-
-// Route pour un catway spécifique -> GET /catways/:id
 router.get('/:id', catwayController.getCatwayById);
-
-// Route pour créer un catway -> POST /catways
 router.post('/', catwayController.createCatway);
-
-// Route pour modifier l'état d'un catway -> PUT /catways/:id
 router.put('/:id', catwayController.updateCatway);
-
-// Route pour supprimer un catway -> DELETE /catways/:id
-router.delete('/:id', catwayController.deleteCatway);
+router.post('/delete/:id', catwayController.deleteCatway);
 
 module.exports = router;
